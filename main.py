@@ -29,6 +29,9 @@ def define_routes(app):
         print(request.path)
         print(content)
 
+        if content is None or 'message' not in content.keys():
+            return "NOK"
+
         chat_id = content['message']['chat']['id']
         text = content['message']['text']
 
