@@ -37,6 +37,7 @@ def define_routes(app):
 
         if env.is_setting_keyword:
             env.keyword = text.upper()
+            env.is_setting_keyword = False
             send_message(chat_id, "Ok. A palavra chave é " + text + ".")
             return "OK"
 
