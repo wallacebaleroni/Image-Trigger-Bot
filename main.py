@@ -36,7 +36,7 @@ def define_routes(app):
         print("MESSAGE="+text)
 
         if env.is_setting_keyword:
-            env.keyword = text.upper()
+            set_keyword(text.upper())
             env.is_setting_keyword = False
             send_message(chat_id, "Ok. A palavra chave é " + text + ".")
             return "OK"
@@ -46,7 +46,10 @@ def define_routes(app):
             send_message(chat_id, "Qual é a palavra?")
             return "OK"
 
-        if env.keyword is not None and env.keyword in text.upper():
+        keyword = get_keyword()
+        print("KEYWORD IS " + keyword)
+
+        if keyword is not None and keyword in text.upper():
             print("KEYWORD FOUND")
             send_message(chat_id, "Opa")
         else:
@@ -67,6 +70,27 @@ def send_message(chat_id, message):
     print(response)
     requests.post('https://api.telegram.org/bot1919169166:AAGdPZEOYGmqL4HWe1ouKcldFy5yoK_fUq8/sendMessage',
                   json=response)
+
+
+def set_keyword(keyword):
+    filename = "keyword.txt"
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    f = open(filename, "w")
+    f.write(keyword)
+    f.close()
+
+
+def get_keyword():
+    filename = "keyword.txt"
+    keyword = None
+
+    if os.path.exists(filename):
+        f = open(filename, "r")
+        keyword = f.read()
+
+    return keyword
 
 
 main()
