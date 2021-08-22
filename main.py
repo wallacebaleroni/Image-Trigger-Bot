@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import os
 
 
@@ -15,6 +15,11 @@ def define_routes(app):
     @app.route("/")
     def index():
         return "Hello"
+
+    @app.route("/update", methods=['POST'])
+    def update():
+        print(request.path)
+        print(request.get_json())
 
 
 main()
