@@ -1,6 +1,7 @@
 from flask import Flask, request
 import os
 import requests
+import random
 import state
 
 
@@ -29,7 +30,7 @@ def define_routes(app):
         print(request.path)
         print(content)
 
-        if is_request_valid(content):
+        if not is_request_valid(content):
             print("NOT VALID MESSAGE")
             return "OK"
 
@@ -44,10 +45,19 @@ def define_routes(app):
             state.is_setting_keyword = False
             send_message(chat_id, "Ok. A palavra chave é " + text + ".")
             return "OK"
+        elif state.is_setting_imagerepo:
+            set_imagerepo(text)
+            state.is_setting_imagerepo = False
+            send_message(chat_id, "Ok. Repositório setado.")
+            return "OK"
 
-        if is_command(content):
+        if is_setkeyword_command(content):
             state.is_setting_keyword = True
             send_message(chat_id, "Qual é a palavra?")
+            return "OK"
+        elif is_setimagerepo_command(content):
+            state.is_setting_imagerepo = True
+            send_message(chat_id, "Qual o link do repositório?")
             return "OK"
 
         keyword = get_keyword()
@@ -58,7 +68,8 @@ def define_routes(app):
 
         if keyword is not None and keyword in text.upper():
             print("KEYWORD FOUND")
-            send_message(chat_id, "Opa")
+            image_url = get_image_from_repo()
+            send_photo(chat_id, image_url)
         else:
             print("KEYWORD NOT FOUND")
 
@@ -71,9 +82,15 @@ def is_request_valid(content):
     return True
 
 
-def is_command(content):
+def is_setkeyword_command(content):
     text = content['message']['text']
-    if text.startswith("/"):
+    if text.startswith("/setkeyword"):
+        return True
+
+
+def is_setimagerepo_command(content):
+    text = content['message']['text']
+    if text.startswith("/setimagerepo"):
         return True
 
 
@@ -82,6 +99,14 @@ def send_message(chat_id, message):
     print("SENDING MESSAGE:")
     print(response)
     requests.post('https://api.telegram.org/bot1919169166:AAGdPZEOYGmqL4HWe1ouKcldFy5yoK_fUq8/sendMessage',
+                  json=response)
+
+
+def send_photo(chat_id, message):
+    response = {"chat_id": chat_id, "photo": message}
+    print("SENDING PHOTO:")
+    print(response)
+    requests.post('https://api.telegram.org/bot1919169166:AAGdPZEOYGmqL4HWe1ouKcldFy5yoK_fUq8/sendPhoto',
                   json=response)
 
 
@@ -104,6 +129,31 @@ def get_keyword():
         keyword = f.read()
 
     return keyword
+
+
+def set_imagerepo(repo):
+    filename = "imagerepo.txt"
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    f = open(filename, "w")
+    f.write(repo)
+    f.close()
+
+
+def get_image_from_repo():
+    filename = "imagerepo.txt"
+
+    if os.path.exists(filename):
+        f = open(filename, "r")
+        repo_url = f.read()
+    else:
+        return None
+
+    repo_file = requests.get(repo_url)
+    repo = repo_file.text.split('\n')
+
+    return random.choice(repo)
 
 
 main()
