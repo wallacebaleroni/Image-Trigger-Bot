@@ -31,6 +31,8 @@ def define_routes(app):
 
         if content is None or 'message' not in content.keys():
             return "NOK"
+        if 'text' not in content['message'].keys():
+            return "NOK"
 
         chat_id = content['message']['chat']['id']
         text = content['message']['text']
