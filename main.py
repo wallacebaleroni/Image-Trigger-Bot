@@ -52,6 +52,8 @@ def define_routes(app):
             return "OK"
 
         keyword = get_keyword()
+        if keyword is None:
+            return "NOK"
         print("KEYWORD IS " + keyword)
 
         if keyword is not None and keyword in text.upper():
