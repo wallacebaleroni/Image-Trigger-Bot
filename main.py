@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 import requests
-import envioronment as env
+import state
 
 
 def main():
@@ -29,10 +29,9 @@ def define_routes(app):
         print(request.path)
         print(content)
 
-        if content is None or 'message' not in content.keys():
-            return "NOK"
-        if 'text' not in content['message'].keys():
-            return "NOK"
+        if is_request_valid(content):
+            print("NOT VALID MESSAGE")
+            return "OK"
 
         chat_id = content['message']['chat']['id']
         text = content['message']['text']
@@ -40,20 +39,21 @@ def define_routes(app):
         print("CHAT_ID="+str(chat_id))
         print("MESSAGE="+text)
 
-        if env.is_setting_keyword:
+        if state.is_setting_keyword:
             set_keyword(text.upper())
-            env.is_setting_keyword = False
+            state.is_setting_keyword = False
             send_message(chat_id, "Ok. A palavra chave é " + text + ".")
             return "OK"
 
         if is_command(content):
-            env.is_setting_keyword = True
+            state.is_setting_keyword = True
             send_message(chat_id, "Qual é a palavra?")
             return "OK"
 
         keyword = get_keyword()
         if keyword is None:
-            return "NOK"
+            print("KEYWORD NOT SET")
+            return "OK"
         print("KEYWORD IS " + keyword)
 
         if keyword is not None and keyword in text.upper():
@@ -63,6 +63,12 @@ def define_routes(app):
             print("KEYWORD NOT FOUND")
 
         return "OK"
+
+
+def is_request_valid(content):
+    if (content is None) or ('message' not in content.keys()) or ('text' not in content['message'].keys()):
+        return False
+    return True
 
 
 def is_command(content):
