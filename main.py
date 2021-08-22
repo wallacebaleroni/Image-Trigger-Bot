@@ -1,10 +1,14 @@
 from flask import Flask
+import os
 
 
 def main():
     app = Flask(__name__)
+
     define_routes(app)
-    app.run(debug=True, port=33507)
+
+    port = os.environ.get('PORT', 5000)
+    app.run(host="0.0.0.0", port=port)
 
 
 def define_routes(app):
