@@ -21,5 +21,7 @@ def define_routes(app):
         print(request.path)
         print(request.get_json())
 
+        return "OK"
+
 
 main()
