@@ -75,6 +75,16 @@ def define_routes(app):
 
         return "OK"
 
+    @app.route("/token", methods=['POST'])
+    def set_token():
+        content = request.get_json()
+        set_telegram_token(content['token'])
+
+        print("SETTING TOKEN")
+        print(content['token'])
+
+        return "OK"
+
 
 def is_request_valid(content):
     if (content is None) or ('message' not in content.keys()) or ('text' not in content['message'].keys()):
@@ -98,7 +108,8 @@ def send_message(chat_id, message):
     response = {"chat_id": chat_id, "text": message}
     print("SENDING MESSAGE:")
     print(response)
-    requests.post('https://api.telegram.org/bot1919169166:AAGdPZEOYGmqL4HWe1ouKcldFy5yoK_fUq8/sendMessage',
+    token = get_telegram_token()
+    requests.post('https://api.telegram.org/bot' + token + '/sendMessage',
                   json=response)
 
 
@@ -106,7 +117,8 @@ def send_photo(chat_id, message):
     response = {"chat_id": chat_id, "photo": message}
     print("SENDING PHOTO:")
     print(response)
-    requests.post('https://api.telegram.org/bot1919169166:AAGdPZEOYGmqL4HWe1ouKcldFy5yoK_fUq8/sendPhoto',
+    token = get_telegram_token()
+    requests.post('https://api.telegram.org/bot' + token + '/sendPhoto',
                   json=response)
 
 
@@ -154,6 +166,27 @@ def get_image_from_repo():
     repo = repo_file.text.split('\n')
 
     return random.choice(repo)
+
+
+def set_telegram_token(token):
+    filename = "telegram_token.txt"
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    f = open(filename, "w")
+    f.write(token)
+    f.close()
+
+
+def get_telegram_token():
+    filename = "telegram_token.txt"
+    token = None
+
+    if os.path.exists(filename):
+        f = open(filename, "r")
+        token = f.read()
+
+    return token
 
 
 main()
