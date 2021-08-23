@@ -63,6 +63,7 @@ def define_routes(app):
         keyword = get_keyword()
         if keyword is None:
             print("KEYWORD NOT SET")
+            send_message(chat_id, "A palavra-chave não está definida")
             return "OK"
         print("KEYWORD IS " + keyword)
 
@@ -71,6 +72,7 @@ def define_routes(app):
             image_url = get_image_from_repo()
             if image_url is None:
                 print("REPO NOT SET")
+                send_message(chat_id, "O repositório não está definido")
                 return "OK"
             send_photo(chat_id, image_url)
         else:
