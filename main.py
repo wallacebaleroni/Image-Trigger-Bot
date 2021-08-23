@@ -69,6 +69,9 @@ def define_routes(app):
         if keyword is not None and keyword in text.upper():
             print("KEYWORD FOUND")
             image_url = get_image_from_repo()
+            if image_url is None:
+                print("REPO NOT SET")
+                return "OK"
             send_photo(chat_id, image_url)
         else:
             print("KEYWORD NOT FOUND")
@@ -108,7 +111,12 @@ def send_message(chat_id, message):
     response = {"chat_id": chat_id, "text": message}
     print("SENDING MESSAGE:")
     print(response)
+
     token = get_telegram_token()
+    if token is None:
+        print("COULD NOT GET TOKEN")
+        return
+
     requests.post('https://api.telegram.org/bot' + token + '/sendMessage',
                   json=response)
 
@@ -117,7 +125,12 @@ def send_photo(chat_id, message):
     response = {"chat_id": chat_id, "photo": message}
     print("SENDING PHOTO:")
     print(response)
+
     token = get_telegram_token()
+    if token is None:
+        print("COULD NOT GET TOKEN")
+        return
+
     requests.post('https://api.telegram.org/bot' + token + '/sendPhoto',
                   json=response)
 
