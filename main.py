@@ -142,6 +142,9 @@ def send_photo(chat_id, message):
 def get_image_from_repo(chat_id):
     repo_url = get_imagerepo(chat_id)
 
+    if repo_url is None:
+        return None
+
     repo_file = requests.get(repo_url)
     repo = repo_file.text.split('\n')
 
