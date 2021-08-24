@@ -14,14 +14,14 @@ def connect_db():
 
 def create_database():
     conn, cursor = connect_db()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS itb.token (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS token (
                             token text  
                       )""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS itb.keyword (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS keyword (
                                 chat_id numeric,
                                 keyword text
                       )""")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS itb.repo (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS repo (
                                 chat_id numeric,
                                 repo text  
                       )""")
@@ -35,9 +35,9 @@ def set_keyword(keyword, chat_id):
     conn, cursor = connect_db()
 
     if get_keyword(chat_id) is not None:
-        cursor.execute("""UPDATE itb.keyword SET keyword='{0}' WHERE chat_id={1}""".format(keyword, chat_id))
+        cursor.execute("""UPDATE keyword SET keyword='{0}' WHERE chat_id={1}""".format(keyword, chat_id))
     else:
-        cursor.execute("""INSERT INTO itb.keyword(chat_id, keyword) VALUES({0}, '{1}')""".format(chat_id, keyword))
+        cursor.execute("""INSERT INTO keyword(chat_id, keyword) VALUES({0}, '{1}')""".format(chat_id, keyword))
 
     conn.commit()
 
@@ -47,7 +47,7 @@ def set_keyword(keyword, chat_id):
 
 def get_keyword(chat_id):
     conn, cursor = connect_db()
-    cursor.execute("""SELECT keyword FROM itb.keyword WHERE chat_id={0}""".format(chat_id))
+    cursor.execute("""SELECT keyword FROM keyword WHERE chat_id={0}""".format(chat_id))
     keyword = cursor.fetchall()
 
     cursor.close()
@@ -65,9 +65,9 @@ def set_imagerepo(repo, chat_id):
     conn, cursor = connect_db()
 
     if get_imagerepo(chat_id) is not None:
-        cursor.execute("""UPDATE itb.repo SET repo='{0}' WHERE chat_id={1}""".format(repo, chat_id))
+        cursor.execute("""UPDATE repo SET repo='{0}' WHERE chat_id={1}""".format(repo, chat_id))
     else:
-        cursor.execute("""INSERT INTO itb.repo(chat_id, repo) VALUES({0}, '{1}')""".format(chat_id, repo))
+        cursor.execute("""INSERT INTO repo(chat_id, repo) VALUES({0}, '{1}')""".format(chat_id, repo))
 
     conn.commit()
 
@@ -77,7 +77,7 @@ def set_imagerepo(repo, chat_id):
 
 def get_imagerepo(chat_id):
     conn, cursor = connect_db()
-    cursor.execute("""SELECT repo FROM itb.repo WHERE chat_id={0}""".format(chat_id))
+    cursor.execute("""SELECT repo FROM repo WHERE chat_id={0}""".format(chat_id))
     repo = cursor.fetchall()
 
     cursor.close()
@@ -95,9 +95,9 @@ def set_telegram_token(token):
     conn, cursor = connect_db()
 
     if get_telegram_token() is not None:
-        cursor.execute("""UPDATE itb.token SET token='{0}'""".format(token))
+        cursor.execute("""UPDATE token SET token='{0}'""".format(token))
     else:
-        cursor.execute("""INSERT INTO itb.token(token) VALUES('{0}')""".format(token))
+        cursor.execute("""INSERT INTO token(token) VALUES('{0}')""".format(token))
 
     conn.commit()
 
@@ -107,7 +107,7 @@ def set_telegram_token(token):
 
 def get_telegram_token():
     conn, cursor = connect_db()
-    cursor.execute("""SELECT token FROM itb.token""")
+    cursor.execute("""SELECT token FROM token""")
     token = cursor.fetchall()
 
     cursor.close()
