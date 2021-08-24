@@ -1,12 +1,14 @@
 from flask import Flask, request
-import os
 import requests
 import random
 import state
+from postgreConnection import *
 
 
 def main():
     app = Flask(__name__)
+
+    create_database()
 
     define_routes(app)
 
@@ -41,12 +43,12 @@ def define_routes(app):
         print("MESSAGE="+text)
 
         if state.is_setting_keyword:
-            set_keyword(text.upper())
+            set_keyword(text.upper(), chat_id)
             state.is_setting_keyword = False
             send_message(chat_id, "Ok. A palavra chave é " + text + ".")
             return "OK"
         elif state.is_setting_imagerepo:
-            set_imagerepo(text)
+            set_imagerepo(text, chat_id)
             state.is_setting_imagerepo = False
             send_message(chat_id, "Ok. Repositório setado.")
             return "OK"
@@ -60,7 +62,7 @@ def define_routes(app):
             send_message(chat_id, "Qual o link do repositório?")
             return "OK"
 
-        keyword = get_keyword()
+        keyword = get_keyword(chat_id)
         if keyword is None:
             print("KEYWORD NOT SET")
             send_message(chat_id, "A palavra-chave não está definida")
@@ -69,7 +71,7 @@ def define_routes(app):
 
         if keyword is not None and keyword in text.upper():
             print("KEYWORD FOUND")
-            image_url = get_image_from_repo()
+            image_url = get_image_from_repo(chat_id)
             if image_url is None:
                 print("REPO NOT SET")
                 send_message(chat_id, "O repositório não está definido")
@@ -137,71 +139,13 @@ def send_photo(chat_id, message):
                   json=response)
 
 
-def set_keyword(keyword):
-    filename = "keyword.txt"
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    f = open(filename, "w")
-    f.write(keyword)
-    f.close()
-
-
-def get_keyword():
-    filename = "keyword.txt"
-    keyword = None
-
-    if os.path.exists(filename):
-        f = open(filename, "r")
-        keyword = f.read()
-
-    return keyword
-
-
-def set_imagerepo(repo):
-    filename = "imagerepo.txt"
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    f = open(filename, "w")
-    f.write(repo)
-    f.close()
-
-
-def get_image_from_repo():
-    filename = "imagerepo.txt"
-
-    if os.path.exists(filename):
-        f = open(filename, "r")
-        repo_url = f.read()
-    else:
-        return None
+def get_image_from_repo(chat_id):
+    repo_url = get_imagerepo(chat_id)
 
     repo_file = requests.get(repo_url)
     repo = repo_file.text.split('\n')
 
     return random.choice(repo)
-
-
-def set_telegram_token(token):
-    filename = "telegram_token.txt"
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    f = open(filename, "w")
-    f.write(token)
-    f.close()
-
-
-def get_telegram_token():
-    filename = "telegram_token.txt"
-    token = None
-
-    if os.path.exists(filename):
-        f = open(filename, "r")
-        token = f.read()
-
-    return token
 
 
 main()
