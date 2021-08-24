@@ -119,12 +119,3 @@ def get_telegram_token():
         token = token[0][0]
 
     return token
-
-
-
-#get_keyword = """SELECT keyword FROM keyword WHERE chat_id=1234"""
-get_repo = """SELECT repo FROM repo WHERE chat_id=1234"""
-
-update_token = """UPDATE token SET token='abc'"""
-update_keyword = """UPDATE keyword SET keyword='abc' WHERE chat_id==1234"""
-update_repo = """UPDATE repo SET repo='abc' WHERE chat_id==1234"""
